@@ -2,8 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/go-playground/validator"
 )
+
+var Validate = validator.New()
 
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -13,5 +18,12 @@ func WriteJSON(w http.ResponseWriter, status int, v any) error {
 
 func WriteError(w http.ResponseWriter, status int, err error) {
 	WriteJSON(w, status, map[string]string{"error": err.Error()})
+
+}
+func ParseJSON(r *http.Request, payload any) error {
+	if r.Body == nil {
+		return errors.New("request body is empty")
+	}
+	return json.NewDecoder(r.Body).Decode(payload)
 
 }
